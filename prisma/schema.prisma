@@ -1,0 +1,197 @@
+// Source of truth for the data model.
+// Prisma 7: the connection URL lives in prisma.config.ts; the runtime client connects via @prisma/adapter-pg
+// (see src/lib/db). Import the generated client from "@/generated/prisma/client".
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ProjectStatus {
+  VERIFIED
+  NEEDS_INPUT
+}
+
+enum BookingStatus {
+  PENDING_MEET // saved, waiting for n8n to create Calendar event + Meet link
+  CONFIRMED
+  CANCELLED
+  DONE
+  NO_SHOW
+}
+
+enum BookingPurpose {
+  JOB_OFFER
+  FREELANCE
+  NETWORKING
+  OTHER
+}
+
+enum ReminderStatus {
+  PENDING
+  SENT
+  DONE
+  CANCELLED
+}
+
+enum EventType {
+  RESUME_DOWNLOAD
+  SERVICE_CLICK
+  PROJECT_CLICK
+  CONTACT_CLICK
+  BOOKING_STARTED
+  BOOKING_CREATED
+  GAME_WIN
+}
+
+// ---------------------------------------------------------------- content
+
+model Project {
+  id        String        @id @default(cuid())
+  slug      String        @unique
+  title     String
+  url       String?
+  stack     String[]
+  order     Int           @default(0)
+  visible   Boolean       @default(true)
+  status    ProjectStatus @default(VERIFIED)
+  // { uz: { type, summary, highlights: string[] }, ru: {...}, en: {...} }
+  content   Json
+  services  Service[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([visible, order])
+}
+
+model Service {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  order     Int       @default(0)
+  visible   Boolean   @default(true)
+  // { uz: { title, description }, ru: {...}, en: {...} }
+  content   Json
+  projects  Project[]
+  bookings  Booking[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([visible, order])
+}
+
+model ResumeFile {
+  id         String   @id @default(cuid())
+  filename   String // stored file name on disk (random), never exposed
+  sizeBytes  Int
+  active     Boolean  @default(false)
+  uploadedAt DateTime @default(now())
+
+  @@index([active])
+}
+
+// ---------------------------------------------------------------- booking
+
+model Booking {
+  id              String         @id @default(cuid())
+  token           String         @unique // 32 random bytes, base64url; used in public manage URL
+  name            String
+  email           String
+  telegram        String?
+  phone           String?
+  company         String?
+  purpose         BookingPurpose
+  serviceId       String?
+  service         Service?       @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  note            String?
+  locale          String         @default("uz")
+  visitorTimezone String         @default("UTC")
+  startsAt        DateTime       @db.Timestamptz(3)
+  endsAt          DateTime       @db.Timestamptz(3)
+  status          BookingStatus  @default(PENDING_MEET)
+  meetUrl         String?
+  calendarEventId String?
+  ownerNotes      String?
+  ipHash          String? // salted hash, never raw IP
+  cancelledAt     DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([startsAt])
+  @@index([status, startsAt])
+  @@index([email])
+}
+
+// IMPORTANT (raw SQL migration, add manually after the first `prisma migrate dev --create-only`):
+//
+//   ALTER TABLE "Booking"
+//     ADD CONSTRAINT booking_no_overlap
+//     EXCLUDE USING gist (tstzrange("startsAt", "endsAt", '[)') WITH &&)
+//     WHERE ("status" <> 'CANCELLED');
+//
+// This is the final guard against double booking. Range types work with GiST without extra extensions.
+// Handle the resulting Postgres error (23P01 exclusion_violation) as HTTP 409 `slot_taken`.
+
+model BlockedSlot {
+  id        String   @id @default(cuid())
+  startsAt  DateTime @db.Timestamptz(3)
+  endsAt    DateTime @db.Timestamptz(3)
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@index([startsAt, endsAt])
+}
+
+// key/value settings. Keys: "availability" -> see docs/SPEC.md §5 defaults, "contacts" -> links
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+model AnalyticsEvent {
+  id        String    @id @default(cuid())
+  type      EventType
+  // e.g. { serviceSlug, projectSlug, locale, purpose }
+  meta      Json?
+  createdAt DateTime  @default(now())
+
+  @@index([type, createdAt])
+}
+
+// ---------------------------------------------------------------- personal assistant bot
+
+model Task {
+  id        String     @id @default(cuid())
+  title     String
+  notes     String?
+  dueAt     DateTime?  @db.Timestamptz(3)
+  done      Boolean    @default(false)
+  doneAt    DateTime?
+  reminders Reminder[]
+  createdAt DateTime   @default(now())
+
+  @@index([done, dueAt])
+}
+
+model Reminder {
+  id          String         @id @default(cuid())
+  text        String
+  remindAt    DateTime       @db.Timestamptz(3)
+  // { type: "daily"|"weekly"|"monthly", time: "HH:mm", weekday?: 1-7, dayOfMonth?: 1-31 }
+  recurrence  Json?
+  status      ReminderStatus @default(PENDING)
+  taskId      String?
+  task        Task?          @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  bookingId   String? // set for meeting-brief reminders
+  kind        String         @default("custom") // "custom" | "brief60" | "brief15" | "digest"
+  snoozeCount Int            @default(0)
+  lastSentAt  DateTime?
+  createdAt   DateTime       @default(now())
+
+  @@index([status, remindAt])
+  @@index([bookingId])
+}

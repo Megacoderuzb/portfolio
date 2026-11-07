@@ -1,0 +1,295 @@
+{
+  "name": "Portfolio: booking-cancelled",
+  "nodes": [
+    {
+      "id": "5f1570fa-07d2-4d5e-ab83-615042a38da8",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "booking-cancelled",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "webhookId": "c0e0fc1b-98b9-4b6c-94f4-214e92a5d42c",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "portfolioWebhookSecret",
+          "name": "Portfolio webhook secret"
+        }
+      }
+    },
+    {
+      "id": "42fa89cb-fd3b-4cbb-b5a1-62fb67ac2f44",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": true,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "304b07ad-b89a-480b-9532-0c7e569d8b44",
+              "name": "appUrl",
+              "value": "http://app:3000",
+              "type": "string"
+            },
+            {
+              "id": "aa1178c8-fb67-4d10-a21e-d40fe0e68689",
+              "name": "sheetId",
+              "value": "PASTE_GOOGLE_SHEET_ID",
+              "type": "string"
+            },
+            {
+              "id": "ffabc7f1-f1c2-444b-b492-bfe8b0a4d6df",
+              "name": "ownerTelegramId",
+              "value": "PASTE_OWNER_TELEGRAM_ID",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Edit after import (docs/N8N-SETUP.md). appUrl = the app as n8n reaches it: dev http://host.docker.internal:3000, prod http://app:3000."
+    },
+    {
+      "id": "dfdeee30-9627-4f34-92e5-24d7497023f8",
+      "name": "Has calendar event?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "a7336c20-f176-4f0c-a79f-1d7f4c9f9e9a",
+              "leftValue": "={{ $json.body.calendarEventId || '' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "6b1ba9e4-aa80-4750-8f3a-40c5aac2e06b",
+      "name": "Delete Calendar event",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        200
+      ],
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://www.googleapis.com/calendar/v3/calendars/primary/events/{{ encodeURIComponent($('Config').item.json.body.calendarEventId) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleCalendarOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "sendUpdates",
+              "value": "all"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "googleCalendarAccount",
+          "name": "Google Calendar account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "notes": "sendUpdates=all emails the visitor the cancellation. 410 Gone = already deleted (continues)."
+    },
+    {
+      "id": "d8e2610c-8bfb-49a1-baec-2cfe21d1e148",
+      "name": "Sheets: mark cancelled",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        900,
+        300
+      ],
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Config').item.json.sheetId }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Bookings"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "bookingId": "={{ $('Config').item.json.body.bookingId }}",
+            "status": "CANCELLED"
+          },
+          "matchingColumns": [
+            "bookingId"
+          ],
+          "schema": [
+            {
+              "id": "bookingId",
+              "displayName": "bookingId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "googleSheetsAccount",
+          "name": "Google Sheets account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "738cf17d-1c7b-4f5e-9554-33d9663325c1",
+      "name": "Telegram: notify owner",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1140,
+        300
+      ],
+      "parameters": {
+        "chatId": "={{ $('Config').item.json.ownerTelegramId }}",
+        "text": "=❌ Uchrashuv bekor qilindi ({{ $('Config').item.json.body.cancelledBy === 'owner' ? 'siz' : 'mehmon' }})\n👤 {{ $('Config').item.json.body.visitor.name }}\n🕒 {{ DateTime.fromISO($('Config').item.json.body.startsAt).setZone('Asia/Tashkent').toFormat('dd.MM.yyyy HH:mm') }} (Toshkent)",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "telegramBot",
+          "name": "Telegram bot"
+        }
+      },
+      "notes": "Send only. Never add a Telegram Trigger for this bot: the worker long-polls it."
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Has calendar event?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has calendar event?": {
+      "main": [
+        [
+          {
+            "node": "Delete Calendar event",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Sheets: mark cancelled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Calendar event": {
+      "main": [
+        [
+          {
+            "node": "Sheets: mark cancelled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets: mark cancelled": {
+      "main": [
+        [
+          {
+            "node": "Telegram: notify owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Tashkent",
+    "saveManualExecutions": true
+  },
+  "pinData": {},
+  "active": false
+}

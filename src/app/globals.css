@@ -1,0 +1,386 @@
+@import "tailwindcss";
+@import "../../design/tokens.css";
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-manrope), var(--font-inter), ui-sans-serif, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --shadow-glow: 0 0 28px var(--glow);
+}
+
+@utility text-h1 {
+  font-size: clamp(2.4rem, 6vw, 4.5rem);
+}
+@utility text-h2 {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+}
+@utility py-section {
+  padding-block: clamp(72px, 10vw, 140px);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  /* no body background: it would paint over the fixed -z background layers (html bg comes from tokens.css) */
+  body {
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  /* anchor targets clear the sticky navbar */
+  [id] {
+    scroll-margin-top: 5.5rem;
+  }
+  :focus-visible {
+    outline: 2px solid var(--violet-300);
+    outline-offset: 2px;
+  }
+}
+
+/* ---------- background: grid + drifting orbs + grain (CSS only) */
+.site-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  overflow: hidden;
+  pointer-events: none;
+}
+.site-bg-orb {
+  position: absolute;
+  width: 60vmax;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  will-change: transform;
+  animation: orb-drift 26s ease-in-out infinite alternate;
+}
+.site-bg-orb.a {
+  top: -25vmax;
+  left: -15vmax;
+  background: radial-gradient(circle, color-mix(in srgb, var(--violet-700) 45%, transparent), transparent 65%);
+}
+.site-bg-orb.b {
+  right: -20vmax;
+  bottom: -30vmax;
+  background: radial-gradient(circle, color-mix(in srgb, var(--violet-900) 70%, transparent), transparent 65%);
+  animation-duration: 34s;
+  animation-direction: alternate-reverse;
+}
+.site-bg-grid {
+  position: absolute;
+  inset: 0;
+  --line: color-mix(in srgb, var(--violet-500) 4%, transparent);
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse at 50% 20%, #000 20%, transparent 75%);
+}
+.site-bg-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+@keyframes orb-drift {
+  to {
+    transform: translate3d(10vmax, 8vmax, 0) scale(1.1);
+  }
+}
+
+/* ---------- native <dialog>: modal + right drawer, CSS enter/exit */
+.ui-dialog {
+  margin: auto;
+  max-width: min(32rem, calc(100vw - 2rem));
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--text);
+  opacity: 0;
+  transform: scale(0.96);
+  transition:
+    opacity 0.2s,
+    transform 0.3s var(--ease-out),
+    overlay 0.3s allow-discrete,
+    display 0.3s allow-discrete;
+}
+.ui-dialog.ui-drawer {
+  margin: 0 0 0 auto;
+  height: 100dvh;
+  max-height: 100dvh;
+  width: min(24rem, 100vw);
+  border-radius: 0;
+  border-width: 0 0 0 1px;
+  transform: translateX(100%);
+}
+.ui-dialog[open] {
+  opacity: 1;
+  transform: none;
+}
+@starting-style {
+  .ui-dialog[open] {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  .ui-dialog.ui-drawer[open] {
+    transform: translateX(100%);
+  }
+}
+.ui-dialog::backdrop {
+  background: color-mix(in srgb, var(--bg-0) 75%, transparent);
+  backdrop-filter: blur(4px);
+}
+
+/* ---------- toast enter */
+.ui-toast {
+  transition:
+    opacity 0.2s,
+    translate 0.3s var(--ease-out);
+  @starting-style {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+
+/* ---------- <Reveal>: scroll entrances, one per section (docs/DESIGN.md table). Played once when JS sets
+   data-shown. Hidden states only apply with scripting enabled, so no-JS visitors see everything.
+   --i = list index (stagger), --side = ±1 (alternating direction). */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    transition:
+      opacity 0.6s var(--ease-out),
+      transform 0.7s var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 80ms);
+  }
+  [data-reveal]:not([data-shown]) {
+    opacity: 0;
+  }
+  [data-reveal="rise"]:not([data-shown]) {
+    transform: translateY(24px);
+  }
+  /* clip-path presets mask the inner .reveal-mask (see <Reveal>) */
+  .reveal-mask {
+    transition: clip-path 0.9s var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 80ms);
+  }
+  /* about: text unmasked left → right */
+  [data-reveal="clip"]:not([data-shown]) {
+    opacity: 1;
+  }
+  [data-reveal="clip"]:not([data-shown]) > .reveal-mask {
+    clip-path: inset(0 100% 0 0);
+  }
+  /* about chips: overshooting "spring" pop, after the text */
+  [data-reveal="pop"] {
+    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition-delay: calc(300ms + var(--i, 0) * 70ms);
+  }
+  [data-reveal="pop"]:not([data-shown]) {
+    transform: scale(0.6);
+  }
+  /* stack rows: alternating sides */
+  [data-reveal="side"]:not([data-shown]) {
+    transform: translateX(calc(var(--side) * 80px));
+  }
+  /* projects: scale up behind a bottom → top curtain */
+  [data-reveal="curtain"]:not([data-shown]) {
+    transform: scale(0.94);
+  }
+  [data-reveal="curtain"]:not([data-shown]) > .reveal-mask {
+    clip-path: inset(100% 0 0 0);
+  }
+  /* services: fly in with a 3D tilt (the list sets perspective) */
+  [data-reveal="tilt"]:not([data-shown]) {
+    transform: translateX(calc(var(--side) * 60px)) rotateY(calc(var(--side) * -12deg));
+  }
+  /* booking panel */
+  [data-reveal="panel"]:not([data-shown]) {
+    transform: scale(0.96);
+  }
+  /* contacts: staggered diagonal */
+  [data-reveal="diagonal"]:not([data-shown]) {
+    transform: translate(-20px, 28px);
+  }
+  /* footer horizon line */
+  [data-reveal="sweep"] {
+    transition-duration: 1s;
+  }
+  [data-reveal="sweep"]:not([data-shown]) {
+    transform: scaleX(0);
+  }
+}
+@media (scripting: enabled) and (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    transition: opacity 0.2s;
+  }
+  [data-reveal]:not([data-shown]) {
+    opacity: 0;
+  }
+}
+
+/* ---------- scroll-linked decoration (CSS scroll timelines; static where unsupported) */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .scroll-progress {
+      animation: grow-x linear both;
+      animation-timeline: scroll(root);
+    }
+    .parallax {
+      animation: parallax linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 700px;
+    }
+    .hero-ring {
+      animation: ring-spin linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 900px;
+    }
+  }
+}
+@supports not (animation-timeline: scroll()) {
+  .scroll-progress {
+    display: none;
+  }
+}
+@keyframes grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes parallax {
+  to {
+    transform: translateY(var(--depth)) rotate(var(--spin, 0deg));
+  }
+}
+@keyframes ring-spin {
+  to {
+    transform: rotate(200deg);
+  }
+}
+
+/* ---------- hero: CSS entrance, so text paints before hydration (good LCP). --i = stagger index */
+.hero-in {
+  animation: hero-in 0.8s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 90ms);
+}
+@keyframes hero-in {
+  from {
+    opacity: 0.1; /* not 0: Chrome only counts LCP once the element is visible */
+    transform: translateY(20px);
+    filter: blur(12px);
+  }
+}
+.hero-card-in {
+  animation: hero-card-in 0.9s var(--ease-out) 0.3s both;
+}
+@keyframes hero-card-in {
+  from {
+    opacity: 0;
+    transform: translateX(48px) rotate(4deg);
+  }
+}
+/* Perf rule for this page: no *infinite* animation in the first viewport. Lighthouse/PageSpeed run headless
+   without a GPU, where every running animation repaints on the main thread (measured: TBT 4.6 s → 0.09 s).
+   Ring and shapes move with scroll instead (see scroll-linked block); pulses are finite. */
+/* terminal typing: each line is unmasked in --n steps after --d (CSS only, no re-renders) */
+.type-line {
+  animation: type-line calc(var(--n) * 28ms) steps(var(--n)) var(--d) both;
+}
+@keyframes type-line {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+.caret {
+  animation: caret-blink 1s steps(1) 12;
+}
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* final state at once (the global rule shortens durations but keeps the delays) */
+  .type-line,
+  .hero-in,
+  .hero-card-in {
+    animation: none;
+  }
+}
+
+/* ---------- booking panel glow pulse: twice, when its <Reveal> is shown (opacity on a pseudo-element) */
+.glow-pulse {
+  position: relative;
+}
+.glow-pulse::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 80px var(--glow);
+  opacity: 0;
+  pointer-events: none;
+}
+[data-shown] .glow-pulse::before {
+  animation: glow-pulse 1.6s ease-in-out 0.4s 2;
+}
+@keyframes glow-pulse {
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ---------- contact icons draw themselves while scrolling into view (no JS; skipped where unsupported) */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .draw-icon :is(path, circle, rect, line, polyline, polygon) {
+      stroke-dasharray: 100;
+      animation: draw linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 40%;
+    }
+  }
+}
+@keyframes draw {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ---------- marquee: track holds the items twice and slides by half */
+.marquee-track {
+  animation: marquee 40s linear infinite;
+}
+/* idle until its section is revealed; pause on hover/focus */
+[data-reveal]:not([data-shown]) .marquee-track,
+.marquee:is(:hover, :focus-within) .marquee-track {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+    width: auto;
+    flex-wrap: wrap;
+  }
+  .marquee-dup {
+    display: none;
+  }
+}

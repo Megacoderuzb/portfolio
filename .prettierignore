@@ -1,0 +1,3 @@
+# kit docs/prompts stay as written
+*.md
+pnpm-lock.yaml

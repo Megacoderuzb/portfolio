@@ -1,0 +1,183 @@
+{
+  "meta": {
+    "title": "Muhammadjon Abduvakhobov — Full-Stack dasturchi",
+    "description": "NestJS va Next.js bilan CRM, savdo platformalari va Telegram botlar yaratuvchi full-stack dasturchi. Bepul konsultatsiyaga yoziling."
+  },
+  "common": {
+    "loading": "Yuklanmoqda...",
+    "error": "Xatolik yuz berdi. Qayta urinib ko'ring.",
+    "back": "Orqaga",
+    "next": "Davom etish",
+    "close": "Yopish",
+    "skipToContent": "Asosiy qismga o'tish"
+  },
+  "nav": {
+    "about": "Men haqimda",
+    "projects": "Loyihalar",
+    "services": "Xizmatlar",
+    "book": "Yozilish",
+    "contact": "Aloqa",
+    "bookCall": "Bepul suhbat",
+    "language": "Til",
+    "menu": "Menyu"
+  },
+  "hero": {
+    "badge": "Ish takliflari va loyihalarga ochiqman",
+    "role": "Full-Stack dasturchi",
+    "title": "Ishonchli veb-tizimlar quraman",
+    "subtitle": "NestJS va Next.js bilan CRM, savdo platformalari va Telegram botlar yarataman. Ish takliflari, bir martalik loyihalar va networking uchun ochiqman.",
+    "ctaBook": "Bepul suhbatga yozilish",
+    "ctaResume": "Resumeni yuklab olish",
+    "stats": {
+      "experience": "yil tajriba",
+      "projects": "loyiha",
+      "stack": "asosiy stack"
+    }
+  },
+  "about": {
+    "title": "Men haqimda",
+    "text": "Men Toshkentda yashayman, full-stack dasturchiman. Backend'da NestJS, PostgreSQL va Redis, frontend'da Next.js va React bilan ishlayman. To'lov tizimlari (Click, Payme, Uzum Bank, Atmos), Telegram botlar va avtomatlashtirish (n8n) bilan real loyihalar yetkazganman. Toshkent davlat iqtisodiyot universitetida FinTech yo'nalishida o'qiyman.",
+    "openTo": {
+      "title": "Ochiqman",
+      "job": "Doimiy ish",
+      "freelance": "Bir martalik loyiha",
+      "networking": "Networking"
+    },
+    "facts": {
+      "education": "Toshkent davlat iqtisodiyot universiteti, FinTech",
+      "languages": "O'zbek (ona tili), Ingliz (C1), Rus (A2)",
+      "location": "Toshkent, O'zbekiston"
+    }
+  },
+  "stack": {
+    "title": "Texnologiyalar",
+    "subtitle": "Kundalik ishlatadigan asboblarim",
+    "groups": {
+      "backend": "Backend",
+      "frontend": "Frontend",
+      "data": "Ma'lumotlar va navbatlar",
+      "devops": "DevOps",
+      "payments": "To'lovlar",
+      "automation": "Avtomatlashtirish va AI"
+    }
+  },
+  "projects": {
+    "title": "Loyihalar",
+    "subtitle": "Yetkazilgan va ishlab turgan tizimlar",
+    "visit": "Saytni ochish",
+    "details": "Batafsil",
+    "close": "Yopish",
+    "highlights": "Asosiy imkoniyatlar",
+    "stack": "Stack",
+    "empty": "Loyihalar tez orada qo'shiladi."
+  },
+  "services": {
+    "title": "Xizmatlar",
+    "subtitle": "Qaysi yo'nalishda yordam kerak? Tanlang va bepul suhbatga yoziling.",
+    "cta": "Yozilish"
+  },
+  "booking": {
+    "title": "Bepul konsultatsiyaga yoziling",
+    "subtitle": "Loyiha, ish taklifi yoki tanishuv haqida gaplashamiz. Tanlangan vaqtga Google Meet havolasi avtomatik yaratiladi.",
+    "free": "Bepul",
+    "duration": "{minutes} daqiqa",
+    "meet": "Google Meet orqali",
+    "steps": {
+      "purpose": "Maqsad",
+      "time": "Vaqt",
+      "details": "Ma'lumotlar",
+      "done": "Tayyor"
+    },
+    "purpose": {
+      "title": "Suhbat maqsadi nima?",
+      "options": {
+        "JOB_OFFER": "Ish taklifi",
+        "FREELANCE": "Bir martalik loyiha",
+        "NETWORKING": "Networking",
+        "OTHER": "Boshqa"
+      }
+    },
+    "service": {
+      "title": "Qaysi xizmat qiziqtiradi?",
+      "none": "Hali aniq emas"
+    },
+    "time": {
+      "title": "Qulay vaqtni tanlang",
+      "timezone": "Vaqtlar sizning vaqt zonangizda ko'rsatilgan: {tz}",
+      "ownerTime": "Toshkent vaqti: {time}",
+      "noSlots": "Bu kunda bo'sh vaqt yo'q. Boshqa kunni tanlang.",
+      "closed": "Yakshanba dam olish kuni. Boshqa kunni tanlang.",
+      "loading": "Bo'sh vaqtlar yuklanmoqda..."
+    },
+    "fields": {
+      "name": "Ismingiz",
+      "email": "Email",
+      "emailHint": "Google Calendar taklifnomasi shu manzilga yuboriladi",
+      "telegram": "Telegram (ixtiyoriy)",
+      "phone": "Telefon (ixtiyoriy)",
+      "company": "Kompaniya (ixtiyoriy)",
+      "note": "Qisqacha izoh (ixtiyoriy)",
+      "notePlaceholder": "Nima haqida gaplashmoqchisiz?"
+    },
+    "submit": "Yozilishni tasdiqlash",
+    "submitting": "Yuborilmoqda...",
+    "success": {
+      "title": "Siz yozildingiz!",
+      "text": "{date} kuni soat {time} da uchrashamiz.",
+      "meetPending": "Google Meet havolasi tayyorlanmoqda. U email taklifnomada ham bo'ladi.",
+      "meetReady": "Uchrashuvga ulanish",
+      "manage": "Yozilishni boshqarish"
+    },
+    "errors": {
+      "required": "Bu maydon majburiy",
+      "email": "Email noto'g'ri",
+      "slotTaken": "Bu vaqt hozirgina band bo'ldi. Boshqa vaqtni tanlang.",
+      "rateLimit": "Juda ko'p urinish. Birozdan keyin qayta urinib ko'ring.",
+      "captcha": "Tekshiruvdan o'tilmadi. Qayta urinib ko'ring.",
+      "generic": "Yozilib bo'lmadi. Qayta urinib ko'ring."
+    }
+  },
+  "manage": {
+    "title": "Yozilishingiz",
+    "joinMeet": "Google Meet'ga ulanish",
+    "cancel": "Yozilishni bekor qilish",
+    "confirmCancel": "Haqiqatan ham bekor qilmoqchimisiz?",
+    "cancelled": "Yozilish bekor qilindi.",
+    "rebook": "Yangi vaqtga yozilish",
+    "notFound": "Yozilish topilmadi."
+  },
+  "contact": {
+    "title": "Aloqa",
+    "subtitle": "Yozing, qo'ng'iroq qiling yoki resumeni yuklab oling.",
+    "email": "Email",
+    "telegram": "Telegram",
+    "linkedin": "LinkedIn",
+    "github": "GitHub",
+    "resume": "Resumeni yuklab olish",
+    "resumeUpdated": "Yangilangan: {date}",
+    "copy": "Nusxalash",
+    "copied": "Nusxalandi"
+  },
+  "footer": {
+    "rights": "Barcha huquqlar himoyalangan.",
+    "game": {
+      "title": "Dam oling: to'pni tushirib yubormang",
+      "hint": "Taxtani suring, shakllarni yo'q qiling.",
+      "start": "Boshlash",
+      "pause": "To'xtatish",
+      "resume": "Davom etish",
+      "restart": "Qayta boshlash",
+      "score": "Ball",
+      "best": "Rekord",
+      "lives": "Jon",
+      "level": "Bosqich",
+      "launch": "To'pni uchirish uchun bosing yoki Space",
+      "win": "G'alaba! Hamma shakllar yo'q qilindi.",
+      "winCta": "Bepul suhbatga yozilish",
+      "lose": "O'yin tugadi",
+      "tryAgain": "Qayta urinish",
+      "skip": "O'yinni o'tkazib yuborish",
+      "label": "Breakout o'yini"
+    }
+  }
+}

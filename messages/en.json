@@ -1,0 +1,183 @@
+{
+  "meta": {
+    "title": "Muhammadjon Abduvakhobov — Full-Stack Developer",
+    "description": "Full-Stack developer building CRMs, commerce platforms and Telegram bots with NestJS and Next.js. Book a free consultation."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong. Please try again.",
+    "back": "Back",
+    "next": "Continue",
+    "close": "Close",
+    "skipToContent": "Skip to main content"
+  },
+  "nav": {
+    "about": "About",
+    "projects": "Projects",
+    "services": "Services",
+    "book": "Book",
+    "contact": "Contact",
+    "bookCall": "Free call",
+    "language": "Language",
+    "menu": "Menu"
+  },
+  "hero": {
+    "badge": "Open to job offers and projects",
+    "role": "Full-Stack Developer",
+    "title": "I build reliable web systems",
+    "subtitle": "I create CRMs, commerce platforms and Telegram bots with NestJS and Next.js. Open to job offers, one-off projects and networking.",
+    "ctaBook": "Book a free call",
+    "ctaResume": "Download resume",
+    "stats": {
+      "experience": "years of experience",
+      "projects": "projects",
+      "stack": "core stack"
+    }
+  },
+  "about": {
+    "title": "About me",
+    "text": "I'm a full-stack developer based in Tashkent. I work with NestJS, PostgreSQL and Redis on the backend and Next.js and React on the frontend. I have shipped real projects with payment systems (Click, Payme, Uzum Bank, Atmos), Telegram bots and automation (n8n). I study FinTech at Tashkent State University of Economics.",
+    "openTo": {
+      "title": "Open to",
+      "job": "Full-time role",
+      "freelance": "One-off project",
+      "networking": "Networking"
+    },
+    "facts": {
+      "education": "Tashkent State University of Economics, FinTech",
+      "languages": "Uzbek (native), English (C1), Russian (A2)",
+      "location": "Tashkent, Uzbekistan"
+    }
+  },
+  "stack": {
+    "title": "Tech stack",
+    "subtitle": "The tools I use every day",
+    "groups": {
+      "backend": "Backend",
+      "frontend": "Frontend",
+      "data": "Data & queues",
+      "devops": "DevOps",
+      "payments": "Payments",
+      "automation": "Automation & AI"
+    }
+  },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "Systems I have shipped and maintain",
+    "visit": "Visit site",
+    "details": "Details",
+    "close": "Close",
+    "highlights": "Key features",
+    "stack": "Stack",
+    "empty": "Projects are coming soon."
+  },
+  "services": {
+    "title": "Services",
+    "subtitle": "What do you need help with? Pick a service and book a free call.",
+    "cta": "Book"
+  },
+  "booking": {
+    "title": "Book a free consultation",
+    "subtitle": "Let's talk about a project, a job offer or just get to know each other. A Google Meet link is created automatically for your slot.",
+    "free": "Free",
+    "duration": "{minutes} min",
+    "meet": "Via Google Meet",
+    "steps": {
+      "purpose": "Purpose",
+      "time": "Time",
+      "details": "Details",
+      "done": "Done"
+    },
+    "purpose": {
+      "title": "What would you like to talk about?",
+      "options": {
+        "JOB_OFFER": "Job offer",
+        "FREELANCE": "One-off project",
+        "NETWORKING": "Networking",
+        "OTHER": "Other"
+      }
+    },
+    "service": {
+      "title": "Which service are you interested in?",
+      "none": "Not sure yet"
+    },
+    "time": {
+      "title": "Pick a time that suits you",
+      "timezone": "Times are shown in your timezone: {tz}",
+      "ownerTime": "Tashkent time: {time}",
+      "noSlots": "No free slots on this day. Please pick another day.",
+      "closed": "Sunday is a day off. Please pick another day.",
+      "loading": "Loading available times..."
+    },
+    "fields": {
+      "name": "Your name",
+      "email": "Email",
+      "emailHint": "The Google Calendar invite will be sent to this address",
+      "telegram": "Telegram (optional)",
+      "phone": "Phone (optional)",
+      "company": "Company (optional)",
+      "note": "Short note (optional)",
+      "notePlaceholder": "What would you like to discuss?"
+    },
+    "submit": "Confirm booking",
+    "submitting": "Sending...",
+    "success": {
+      "title": "You're booked!",
+      "text": "See you on {date} at {time}.",
+      "meetPending": "Your Google Meet link is being prepared. It will also be in the email invite.",
+      "meetReady": "Join the meeting",
+      "manage": "Manage booking"
+    },
+    "errors": {
+      "required": "This field is required",
+      "email": "Invalid email",
+      "slotTaken": "That time was just taken. Please choose another.",
+      "rateLimit": "Too many attempts. Please try again shortly.",
+      "captcha": "Verification failed. Please try again.",
+      "generic": "Could not complete the booking. Please try again."
+    }
+  },
+  "manage": {
+    "title": "Your booking",
+    "joinMeet": "Join Google Meet",
+    "cancel": "Cancel booking",
+    "confirmCancel": "Are you sure you want to cancel?",
+    "cancelled": "Booking cancelled.",
+    "rebook": "Book a new time",
+    "notFound": "Booking not found."
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Write, call or download my resume.",
+    "email": "Email",
+    "telegram": "Telegram",
+    "linkedin": "LinkedIn",
+    "github": "GitHub",
+    "resume": "Download resume",
+    "resumeUpdated": "Updated: {date}",
+    "copy": "Copy",
+    "copied": "Copied"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "game": {
+      "title": "Take a break: don't drop the ball",
+      "hint": "Move the board and destroy all the shapes.",
+      "start": "Start",
+      "pause": "Pause",
+      "resume": "Resume",
+      "restart": "Restart",
+      "score": "Score",
+      "best": "Best",
+      "lives": "Lives",
+      "level": "Level",
+      "launch": "Click or press Space to launch the ball",
+      "win": "You won! All shapes destroyed.",
+      "winCta": "Book a free call",
+      "lose": "Game over",
+      "tryAgain": "Try again",
+      "skip": "Skip the game",
+      "label": "Breakout game"
+    }
+  }
+}

@@ -1,0 +1,181 @@
+{
+  "name": "Portfolio: weekly-summary",
+  "nodes": [
+    {
+      "id": "e145e360-b9cb-4df8-a72d-a34f5b236213",
+      "name": "Every Sunday 20:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 20 * * 0"
+            }
+          ]
+        }
+      },
+      "notes": "Evaluated in the workflow timezone (Settings → Asia/Tashkent)."
+    },
+    {
+      "id": "0d82c487-17a9-409f-be3c-eb6ce162101b",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": true,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "881bfd74-6503-426a-bb37-903a3f8688e2",
+              "name": "appUrl",
+              "value": "http://app:3000",
+              "type": "string"
+            },
+            {
+              "id": "c568478c-8b73-4831-936a-eb69d8b19d0b",
+              "name": "sheetId",
+              "value": "PASTE_GOOGLE_SHEET_ID",
+              "type": "string"
+            },
+            {
+              "id": "a52921e6-332a-462a-9396-0f8b13b0cb8f",
+              "name": "ownerTelegramId",
+              "value": "PASTE_OWNER_TELEGRAM_ID",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Edit after import (docs/N8N-SETUP.md). appUrl = the app as n8n reaches it: dev http://host.docker.internal:3000, prod http://app:3000."
+    },
+    {
+      "id": "001d9748-bc4f-4762-9803-d06c3ce6dec5",
+      "name": "App: stats",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.appUrl }}/api/n8n/stats",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "portfolioCallbackSecret",
+          "name": "Portfolio callback secret"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 30000
+    },
+    {
+      "id": "e6735dfa-5304-40f5-9363-bfeed12bde1f",
+      "name": "Format",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        300
+      ],
+      "parameters": {
+        "jsCode": "// GET /api/n8n/stats → Uzbek summary text.\nconst s = $input.first().json;\nconst d = (iso) => DateTime.fromISO(iso).setZone('Asia/Tashkent').toFormat('dd.MM');\nconst top = (s.topServices || []).map((t) => t.slug + ' (' + t.clicks + ')').join(', ') || '—';\nreturn [{ json: { text: [\n  '📊 Haftalik hisobot (' + d(s.from) + ' – ' + d(s.to) + ')',\n  '🗓 Yangi yozilishlar: ' + s.bookings + ' (bekor qilingan: ' + s.cancelled + ')',\n  '📄 Rezyume yuklab olindi: ' + s.resumeDownloads,\n  '🧩 Ko\\'p bosilgan xizmatlar: ' + top,\n].join('\\n') } }];"
+      }
+    },
+    {
+      "id": "fc46de5c-c6ea-4b8b-afd3-587ff98afff4",
+      "name": "Telegram: send summary",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        300
+      ],
+      "parameters": {
+        "chatId": "={{ $('Config').item.json.ownerTelegramId }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "telegramBot",
+          "name": "Telegram bot"
+        }
+      },
+      "notes": "Send only. Never add a Telegram Trigger for this bot: the worker long-polls it."
+    }
+  ],
+  "connections": {
+    "Every Sunday 20:00": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "App: stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "App: stats": {
+      "main": [
+        [
+          {
+            "node": "Format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format": {
+      "main": [
+        [
+          {
+            "node": "Telegram: send summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Tashkent",
+    "saveManualExecutions": true
+  },
+  "pinData": {},
+  "active": false
+}

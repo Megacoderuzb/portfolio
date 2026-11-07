@@ -1,0 +1,77 @@
+/* Design tokens — purple + black only.
+   Written for Tailwind CSS v4 (@theme). If Tailwind v3 is installed, move these into tailwind.config theme.extend.colors
+   and keep the :root variables for non-Tailwind code (e.g. the game canvas reads them via getComputedStyle). */
+
+:root {
+  --bg-0: #07070b;
+  --bg-1: #0a0a0f;
+  --surface: #111018;
+  --surface-2: #17151f;
+  --border: #26232f;
+  --border-glow: rgba(167, 139, 250, 0.16);
+
+  --violet-300: #c4b5fd;
+  --violet-400: #a78bfa;
+  --violet-500: #8b5cf6;
+  --violet-600: #7c3aed;
+  --violet-700: #6d28d9;
+  --violet-800: #5b21b6;
+  --violet-900: #3b0f7a;
+
+  --text: #f4f2fa;
+  --muted: #a29db5;
+  --dim: #6e6a80;
+
+  --glow: rgba(139, 92, 246, 0.35);
+
+  /* functional states only */
+  --danger: #f87171;
+  --success: #34d399;
+
+  --radius-card: 20px;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@theme {
+  /* drop Tailwind's default palette: only these tokens exist as color utilities */
+  --color-*: initial;
+  --color-bg-0: #07070b;
+  --color-bg-1: #0a0a0f;
+  --color-surface: #111018;
+  --color-surface-2: #17151f;
+  --color-border: #26232f;
+  --color-violet-300: #c4b5fd;
+  --color-violet-400: #a78bfa;
+  --color-violet-500: #8b5cf6;
+  --color-violet-600: #7c3aed;
+  --color-violet-700: #6d28d9;
+  --color-violet-800: #5b21b6;
+  --color-violet-900: #3b0f7a;
+  --color-text: #f4f2fa;
+  --color-muted: #a29db5;
+  --color-dim: #6e6a80;
+  --color-danger: #f87171;
+  --color-success: #34d399;
+}
+
+html {
+  color-scheme: dark;
+  background: var(--bg-1);
+  color: var(--text);
+}
+
+::selection {
+  background: var(--violet-600);
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

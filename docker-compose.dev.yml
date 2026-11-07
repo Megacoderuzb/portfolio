@@ -1,0 +1,51 @@
+# Local development infrastructure only. Run the app and worker on your machine: `pnpm dev` and `pnpm worker`.
+name: portfolio-dev
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: portfolio
+      POSTGRES_PASSWORD: change-me
+      POSTGRES_DB: portfolio
+    ports:
+      # DB_PORT (in .env) if 5432 is taken, e.g. by a locally installed PostgreSQL
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portfolio -d portfolio"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest # pin to a specific version once it works
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Tashkent
+      GENERIC_TIMEZONE: Asia/Tashkent
+      N8N_HOST: localhost
+      N8N_PORT: "5678"
+      N8N_PROTOCOL: http
+      WEBHOOK_URL: http://localhost:5678/
+      N8N_ENCRYPTION_KEY: dev-only-change-me
+    ports:
+      - "127.0.0.1:5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  db_data:
+  redis_data:
+  n8n_data:

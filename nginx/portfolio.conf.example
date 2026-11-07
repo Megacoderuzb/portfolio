@@ -1,0 +1,81 @@
+# Copy to /etc/nginx/sites-available/portfolio.conf, replace example.uz with the real domain,
+# enable it, then run:
+#   sudo certbot --nginx -d example.uz -d www.example.uz -d admin.example.uz -d api.example.uz -d n8n.example.uz
+# (certbot adds the TLS blocks and the HTTP -> HTTPS redirect).
+
+# --- main site
+server {
+    listen 80;
+    server_name example.uz www.example.uz;
+
+    client_max_body_size 10m;   # resume upload (app enforces 5 MB)
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+
+    # long cache for hashed static assets
+    location /_next/static/ {
+        proxy_pass http://127.0.0.1:3000;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+}
+
+# --- admin panel (same Next.js app; it serves only /admin here, see ADMIN_URL)
+server {
+    listen 80;
+    server_name admin.example.uz;
+
+    client_max_body_size 10m;   # resume upload (app enforces 5 MB)
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;                 # the app picks the allowed paths from the Host header
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# --- public API (same Next.js app; it serves only /api here and answers CORS for the site, see NEXT_PUBLIC_API_URL)
+server {
+    listen 80;
+    server_name api.example.uz;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;                 # the app picks the allowed paths from the Host header
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# --- n8n (editor + webhooks)
+server {
+    listen 80;
+    server_name n8n.example.uz;
+
+    client_max_body_size 16m;
+
+    location / {
+        proxy_pass http://127.0.0.1:5678;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;      # n8n editor uses websockets
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 300s;
+    }
+}

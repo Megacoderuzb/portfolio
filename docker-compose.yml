@@ -1,0 +1,98 @@
+# Production stack for the VPS. Nginx runs on the host and proxies to the loopback ports below.
+# Usage:
+#   cp .env.example .env   # fill in real values
+#   docker compose build
+#   docker compose run --rm worker pnpm prisma migrate deploy
+#   docker compose run --rm worker pnpm seed
+#   docker compose up -d
+name: portfolio
+
+x-app-env: &app-env
+  NODE_ENV: production
+  TZ: Asia/Tashkent
+  DATABASE_URL: postgresql://portfolio:${POSTGRES_PASSWORD}@db:5432/portfolio
+  REDIS_URL: redis://redis:6379
+  RESUME_DIR: /data/resume
+  N8N_BASE_URL: http://n8n:5678
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: portfolio
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: portfolio
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portfolio -d portfolio"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+
+  app:
+    build:
+      context: .
+      target: app
+      args:
+        APP_URL: ${APP_URL:?set APP_URL in .env (public https URL: it is baked into SEO tags at build)}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-}
+    restart: unless-stopped
+    env_file: .env
+    environment: *app-env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - resume_data:/data/resume
+
+  worker:
+    build:
+      context: .
+      target: worker
+    restart: unless-stopped
+    env_file: .env
+    environment: *app-env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    # run exactly ONE worker: Telegram long polling must not run twice
+    deploy:
+      replicas: 1
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest # pin to a specific version after the first successful run
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Tashkent
+      GENERIC_TIMEZONE: Asia/Tashkent
+      N8N_HOST: ${N8N_HOST}
+      N8N_PORT: "5678"
+      N8N_PROTOCOL: https
+      WEBHOOK_URL: https://${N8N_HOST}/
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+      N8N_SECURE_COOKIE: "true"
+    ports:
+      - "127.0.0.1:5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  db_data:
+  redis_data:
+  n8n_data:
+  resume_data:

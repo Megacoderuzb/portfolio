@@ -1,0 +1,218 @@
+{
+  "_note": "uz/ru versions of the English seed text in seed-data.json, same shape as the DB `content` column. \"_review\": true = machine-drafted, owner review needed. Only visible items are translated.",
+  "services": {
+    "landing-corporate": {
+      "_review": true,
+      "uz": {
+        "title": "Landing va korporativ saytlar",
+        "description": "Next.js'da tez ishlaydigan, SEO'ga tayyor kompaniya saytlari va landing sahifalar."
+      },
+      "ru": {
+        "title": "Лендинги и корпоративные сайты",
+        "description": "Быстрые сайты компаний и лендинги на Next.js, готовые к SEO."
+      }
+    },
+    "crm-pms": {
+      "_review": true,
+      "uz": {
+        "title": "CRM / PMS / admin tizimlar",
+        "description": "Biznesingizga moslab yaratilgan boshqaruv tizimlari: rollar, to'lovlar, hisobotlar, dashboardlar."
+      },
+      "ru": {
+        "title": "CRM / PMS / админ-системы",
+        "description": "Системы управления под ваш бизнес: роли, платежи, отчёты, дашборды."
+      }
+    },
+    "ecommerce-ticketing": {
+      "_review": true,
+      "uz": {
+        "title": "Internet-do'kon va chipta savdosi",
+        "description": "Click / Payme / Uzum / Atmos to'lovlari bilan onlayn do'konlar va chipta sotish."
+      },
+      "ru": {
+        "title": "Интернет-магазины и продажа билетов",
+        "description": "Онлайн-магазины и продажа билетов с оплатой через Click / Payme / Uzum / Atmos."
+      }
+    },
+    "telegram-bots": {
+      "_review": true,
+      "uz": {
+        "title": "Telegram botlar va Mini App'lar",
+        "description": "Biznes botlar, eslatmalar, Mini App'lar va admin panellar."
+      },
+      "ru": {
+        "title": "Telegram-боты и Mini Apps",
+        "description": "Бизнес-боты, напоминания, Mini Apps и админ-панели."
+      }
+    },
+    "automation-n8n": {
+      "_review": true,
+      "uz": {
+        "title": "Avtomatlashtirish (n8n)",
+        "description": "Google Sheets, Calendar, Telegram va boshqa vositalarni yagona ish jarayonlariga ulayman."
+      },
+      "ru": {
+        "title": "Автоматизация (n8n)",
+        "description": "Связываю Google Sheets, Calendar, Telegram и другие сервисы в единые рабочие процессы."
+      }
+    },
+    "backend-api": {
+      "_review": true,
+      "uz": {
+        "title": "Backend va API ishlab chiqish",
+        "description": "NestJS'da REST API, PostgreSQL, Redis, navbatlar, Swagger hujjatlari."
+      },
+      "ru": {
+        "title": "Разработка backend и API",
+        "description": "REST API на NestJS, PostgreSQL, Redis, очереди, документация Swagger."
+      }
+    }
+  },
+  "projects": {
+    "poweryarn": {
+      "_review": true,
+      "uz": {
+        "type": "Korporativ sayt",
+        "summary": "Mahalliy va xalqaro B2B xaridorlarga mo'ljallangan, O'zbekistondagi ulgurji paxta ipi yetkazib beruvchi kompaniyaning korporativ sayti.",
+        "highlights": [
+          "Ip turi va nomeri bo'yicha mahsulot katalogi (karda, penye, kompakt, open-end, melanj)",
+          "Kompaniya, yangiliklar va aloqa bo'limlari",
+          "O'zbek tilidagi kontent, rus va ingliz tillaridagi SEO kalit so'zlar bilan"
+        ]
+      },
+      "ru": {
+        "type": "Корпоративный сайт",
+        "summary": "Корпоративный сайт узбекского оптового поставщика хлопковой пряжи для местных и международных B2B-покупателей.",
+        "highlights": [
+          "Каталог продукции по типу и номеру пряжи (кардная, гребенная, компакт, open-end, меланж)",
+          "Разделы о компании, новости и контакты",
+          "Контент на узбекском с SEO-ключами на русском и английском"
+        ]
+      }
+    },
+    "saadahbooks": {
+      "_review": true,
+      "uz": {
+        "type": "Onlayn kitob do'koni (e-commerce)",
+        "summary": "Kitoblar, kanselyariya tovarlari va diniy mahsulotlar sotiladigan, butun O'zbekiston bo'ylab yetkazib beradigan onlayn kitob do'koni.",
+        "highlights": [
+          "Kategoriyalar, bestsellerlar, yangi kelganlar va chegirmalar bilan katalog",
+          "Referal kupon dasturi va bepul yetkazib berish chegarasi",
+          "Click, Paylov, UZCARD va HUMO orqali to'lov",
+          "Buyurtma holati va takliflar uchun Telegram bot",
+          "Xayriya sahifasi, blog, o'zbek / rus / ingliz tilidagi kitoblar katalogi"
+        ]
+      },
+      "ru": {
+        "type": "Онлайн-книжный магазин (e-commerce)",
+        "summary": "Онлайн-магазин книг, канцтоваров и религиозной продукции с доставкой по всему Узбекистану.",
+        "highlights": [
+          "Каталог с категориями, бестселлерами, новинками и скидками",
+          "Реферальная программа с купонами и порог бесплатной доставки",
+          "Оплата через Click, Paylov, UZCARD и HUMO",
+          "Telegram-бот для статуса заказов и акций",
+          "Страница пожертвований, блог, каталог книг на узбекском / русском / английском"
+        ]
+      }
+    },
+    "dormix": {
+      "_review": true,
+      "uz": {
+        "type": "PMS platforma",
+        "summary": "Yotoqxonalar va hostellar uchun mulkni boshqarish tizimi (PMS).",
+        "highlights": []
+      },
+      "ru": {
+        "type": "PMS-платформа",
+        "summary": "Система управления объектами (PMS) для общежитий и хостелов.",
+        "highlights": []
+      }
+    },
+    "xalqlar-dostligi-ticket": {
+      "_review": true,
+      "uz": {
+        "type": "Chipta sotish platformasi",
+        "summary": "O'zbekistonning eng katta konsert zali uchun konsert chiptalarini onlayn sotish.",
+        "highlights": []
+      },
+      "ru": {
+        "type": "Платформа продажи билетов",
+        "summary": "Онлайн-продажа билетов на концерты крупнейшего концертного зала Узбекистана.",
+        "highlights": []
+      }
+    },
+    "game-bar-crm": {
+      "_review": true,
+      "uz": {
+        "type": "CRM / avtomatlashtirish",
+        "summary": "O'yin barining kundalik ishlarini avtomatlashtiruvchi CRM.",
+        "highlights": []
+      },
+      "ru": {
+        "type": "CRM / автоматизация",
+        "summary": "CRM, автоматизирующая ежедневную работу гейм-бара.",
+        "highlights": []
+      }
+    },
+    "avtomaktab-crm": {
+      "_review": true,
+      "uz": {
+        "type": "CRM + Telegram botlar",
+        "summary": "Avtomaktab uchun boshqaruv tizimi.",
+        "highlights": [
+          "Xodimlar rollari va huquqlari, filiallar, o'quvchilar voronkasi",
+          "To'lovlar, savollar bazasini Excel'dan import qiluvchi nazariy imtihon moduli",
+          "Instruktorlar va mashinalar jadvali, hisobotlar dashboardi",
+          "Telegram'da menejer va o'quvchi botlari"
+        ]
+      },
+      "ru": {
+        "type": "CRM + Telegram-боты",
+        "summary": "Система управления автошколой.",
+        "highlights": [
+          "Роли и права сотрудников, филиалы, воронка учеников",
+          "Платежи, модуль теоретического экзамена с импортом базы вопросов из Excel",
+          "Расписание инструкторов и автомобилей, дашборд отчётов",
+          "Бот для менеджеров и бот для учеников в Telegram"
+        ]
+      }
+    },
+    "davotop": {
+      "_review": true,
+      "uz": {
+        "type": "Dorixona boshqaruvi",
+        "summary": "NestJS backend va Next.js admin paneliga ega dorixonani boshqarish ilovasi.",
+        "highlights": [
+          "Rollarga asoslangan kirish nazorati bilan JWT autentifikatsiya",
+          "Narx jadvallarini tahrirlash mumkin bo'lgan admin panel"
+        ]
+      },
+      "ru": {
+        "type": "Управление аптекой",
+        "summary": "Приложение для управления аптекой: backend на NestJS и админ-панель на Next.js.",
+        "highlights": ["JWT-аутентификация с ролевым доступом", "Админ-панель с редактируемыми таблицами цен"]
+      }
+    },
+    "timemanager-bot": {
+      "_review": true,
+      "uz": {
+        "type": "Telegram bot + Mini App",
+        "summary": "Pul boshqaruvi ilovasi uslubidagi shaxsiy vaqtni hisoblash boti.",
+        "highlights": [
+          "O'zbek tilida vaqt bloklarini yozib borish va samaradorlikni kuzatish",
+          "Google Sheets bilan sinxronlash va cron asosidagi eslatmalar",
+          "React Mini App va admin panel"
+        ]
+      },
+      "ru": {
+        "type": "Telegram-бот + Mini App",
+        "summary": "Личный бот для учёта времени по образцу приложения для учёта финансов.",
+        "highlights": [
+          "Учёт временных блоков на узбекском и отслеживание продуктивности",
+          "Синхронизация с Google Sheets и напоминания по cron",
+          "Mini App на React и админ-панель"
+        ]
+      }
+    }
+  }
+}

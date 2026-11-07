@@ -1,0 +1,545 @@
+{
+  "name": "Portfolio: booking-created",
+  "nodes": [
+    {
+      "id": "eae06a70-df53-47fe-8b8a-a9f77df3d7ab",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "booking-created",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "webhookId": "e382932e-e799-47d4-8273-ebd887fcab3e",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "portfolioWebhookSecret",
+          "name": "Portfolio webhook secret"
+        }
+      }
+    },
+    {
+      "id": "8817ceac-fa00-48e4-9a96-762f239a94e9",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": true,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1d9d6746-a508-4a0b-be5d-72708beda789",
+              "name": "appUrl",
+              "value": "http://app:3000",
+              "type": "string"
+            },
+            {
+              "id": "774a9146-70c6-4892-a0d3-b78a5f64f9a8",
+              "name": "sheetId",
+              "value": "PASTE_GOOGLE_SHEET_ID",
+              "type": "string"
+            },
+            {
+              "id": "d57bb4db-4715-47e2-98d6-1de362f23b75",
+              "name": "ownerTelegramId",
+              "value": "PASTE_OWNER_TELEGRAM_ID",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "notes": "Edit after import (docs/N8N-SETUP.md). appUrl = the app as n8n reaches it: dev http://host.docker.internal:3000, prod http://app:3000."
+    },
+    {
+      "id": "271fc9f2-bc4a-4fd0-9083-03cfff1bb260",
+      "name": "Prepare",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "jsCode": "// Formats the booking once (Asia/Tashkent). Later nodes read $('Prepare').\nconst { body: b, appUrl, sheetId, ownerTelegramId } = $input.first().json;\nconst v = b.visitor;\nconst zone = 'Asia/Tashkent';\nconst uz = { JOB_OFFER: 'Ish taklifi', FREELANCE: 'Bir martalik loyiha', NETWORKING: 'Networking', OTHER: 'Boshqa' };\nconst en = { JOB_OFFER: 'Job offer', FREELANCE: 'Freelance project', NETWORKING: 'Networking', OTHER: 'Other' };\nconst startsTashkent = DateTime.fromISO(b.startsAt).setZone(zone).toFormat('dd.MM.yyyy HH:mm');\nconst service = b.service ? b.service.title : '';\n\nreturn [{ json: {\n  appUrl, sheetId, ownerTelegramId,\n  booking: b,\n  startsTashkent,\n  createdTashkent: DateTime.now().setZone(zone).toFormat('dd.MM.yyyy HH:mm'),\n  service,\n  event: {\n    summary: 'Consultation: ' + v.name + ' (' + (en[b.purpose] || b.purpose) + ')',\n    description: [\n      'Purpose: ' + (en[b.purpose] || b.purpose),\n      'Service: ' + (service || '—'),\n      'Company: ' + (v.company || '—'),\n      'Telegram: ' + (v.telegram || '—'),\n      'Phone: ' + (v.phone || '—'),\n      'Note: ' + (b.note || '—'),\n      '',\n      'Manage / cancel: ' + b.manageUrl,\n    ].join('\\n'),\n    start: { dateTime: b.startsAt, timeZone: zone },\n    end: { dateTime: b.endsAt, timeZone: zone },\n    attendees: [{ email: v.email, displayName: v.name }],\n    conferenceData: { createRequest: { requestId: b.bookingId, conferenceSolutionKey: { type: 'hangoutsMeet' } } },\n    reminders: { useDefault: false, overrides: [{ method: 'popup', minutes: 30 }, { method: 'popup', minutes: 10 }] },\n  },\n  ownerText: [\n    '🆕 Yangi uchrashuv',\n    '👤 ' + v.name + (v.company ? ' (' + v.company + ')' : ''),\n    '🎯 Maqsad: ' + (uz[b.purpose] || b.purpose),\n    '🧩 Xizmat: ' + (service || '—'),\n    '🕒 ' + startsTashkent + ' (Toshkent)',\n    '📧 ' + [v.email, v.telegram, v.phone].filter(Boolean).join('  '),\n    '📝 ' + (b.note || '—'),\n  ].join('\\n'),\n} }];"
+      }
+    },
+    {
+      "id": "b5fd03d2-17ac-41ad-adbc-0d54e7f18c99",
+      "name": "Create Calendar event + Meet",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        300
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/calendar/v3/calendars/primary/events",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleCalendarOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "conferenceDataVersion",
+              "value": "1"
+            },
+            {
+              "name": "sendUpdates",
+              "value": "all"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.event) }}",
+        "options": {}
+      },
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "googleCalendarAccount",
+          "name": "Google Calendar account"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "notes": "Calendar API directly: conferenceDataVersion=1 creates the Meet link; sendUpdates=all emails the visitor the invite (their confirmation)."
+    },
+    {
+      "id": "b060a8ff-ced8-4df0-93eb-ccc430d47873",
+      "name": "App: booking-confirmed",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        200
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').item.json.appUrl }}/api/n8n/booking-confirmed",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ bookingId: $('Prepare').item.json.booking.bookingId, calendarEventId: $('Create Calendar event + Meet').item.json.id, meetUrl: ($('Create Calendar event + Meet').item.json.hangoutLink || (($('Create Calendar event + Meet').item.json.conferenceData || {}).entryPoints || [{}])[0].uri || '') }) }}",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "portfolioCallbackSecret",
+          "name": "Portfolio callback secret"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "id": "6e7cd19b-dd4a-406f-8921-8c4b0d789e82",
+      "name": "Sheets: append row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1140,
+        100
+      ],
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Config').item.json.sheetId }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Bookings"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "bookingId": "={{ $('Prepare').item.json.booking.bookingId }}",
+            "createdAt": "={{ $('Prepare').item.json.createdTashkent }}",
+            "status": "CONFIRMED",
+            "startsAt (Tashkent)": "={{ $('Prepare').item.json.startsTashkent }}",
+            "name": "={{ $('Prepare').item.json.booking.visitor.name }}",
+            "email": "={{ $('Prepare').item.json.booking.visitor.email }}",
+            "telegram": "={{ $('Prepare').item.json.booking.visitor.telegram || '' }}",
+            "phone": "={{ $('Prepare').item.json.booking.visitor.phone || '' }}",
+            "company": "={{ $('Prepare').item.json.booking.visitor.company || '' }}",
+            "purpose": "={{ $('Prepare').item.json.booking.purpose }}",
+            "service": "={{ $('Prepare').item.json.service }}",
+            "note": "={{ $('Prepare').item.json.booking.note || '' }}",
+            "meetUrl": "={{ ($('Create Calendar event + Meet').item.json.hangoutLink || (($('Create Calendar event + Meet').item.json.conferenceData || {}).entryPoints || [{}])[0].uri || '') }}",
+            "visitorTimezone": "={{ $('Prepare').item.json.booking.visitor.timezone }}",
+            "locale": "={{ $('Prepare').item.json.booking.visitor.locale }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "bookingId",
+              "displayName": "bookingId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "createdAt",
+              "displayName": "createdAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "startsAt (Tashkent)",
+              "displayName": "startsAt (Tashkent)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "telegram",
+              "displayName": "telegram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "purpose",
+              "displayName": "purpose",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "service",
+              "displayName": "service",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "note",
+              "displayName": "note",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "meetUrl",
+              "displayName": "meetUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "visitorTimezone",
+              "displayName": "visitorTimezone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "locale",
+              "displayName": "locale",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "googleSheetsAccount",
+          "name": "Google Sheets account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "ecc638dc-441e-41df-b524-841a129ffa8f",
+      "name": "Telegram: notify owner",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1380,
+        100
+      ],
+      "parameters": {
+        "chatId": "={{ $('Config').item.json.ownerTelegramId }}",
+        "text": "={{ $('Prepare').item.json.ownerText }}\n🔗 {{ ($('Create Calendar event + Meet').item.json.hangoutLink || (($('Create Calendar event + Meet').item.json.conferenceData || {}).entryPoints || [{}])[0].uri || '') || '—' }}\nAdmin: {{ $('Prepare').item.json.booking.adminUrl }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "telegramBot",
+          "name": "Telegram bot"
+        }
+      },
+      "notes": "Send only. Never add a Telegram Trigger for this bot: the worker long-polls it."
+    },
+    {
+      "id": "db1769f8-4097-4de7-acc9-2f02f29a7772",
+      "name": "App: booking-failed",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        460
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').item.json.appUrl }}/api/n8n/booking-failed",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ bookingId: $('Prepare').item.json.booking.bookingId, error: String(($json.error && ($json.error.message || $json.error)) || 'Google Calendar step failed').slice(0, 300) }) }}",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "portfolioCallbackSecret",
+          "name": "Portfolio callback secret"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "63d1adb9-6c16-47d4-a698-bd9bd2a89a32",
+      "name": "Telegram: calendar failed",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1140,
+        460
+      ],
+      "parameters": {
+        "chatId": "={{ $('Config').item.json.ownerTelegramId }}",
+        "text": "=⚠️ Google Calendar/Meet yaratilmadi.\n👤 {{ $('Prepare').item.json.booking.visitor.name }}\n🕒 {{ $('Prepare').item.json.startsTashkent }} (Toshkent)\nYozilish PENDING_MEET holatida qoldi. Sababini n8n → Executions da ko'ring, so'ng Admin → Bookings → Retry:\n{{ $('Prepare').item.json.booking.adminUrl }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "telegramBot",
+          "name": "Telegram bot"
+        }
+      },
+      "notes": "Send only. Never add a Telegram Trigger for this bot: the worker long-polls it."
+    },
+    {
+      "id": "5425d663-cd8d-4e29-945b-c14146bf2f86",
+      "name": "Telegram: callback failed",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1140,
+        300
+      ],
+      "parameters": {
+        "chatId": "={{ $('Config').item.json.ownerTelegramId }}",
+        "text": "=⚠️ Calendar tadbiri va Meet yaratildi, lekin ilova tasdiqni qabul qilmadi.\n👤 {{ $('Prepare').item.json.booking.visitor.name }}\n🕒 {{ $('Prepare').item.json.startsTashkent }} (Toshkent)\n🔗 {{ ($('Create Calendar event + Meet').item.json.hangoutLink || (($('Create Calendar event + Meet').item.json.conferenceData || {}).entryPoints || [{}])[0].uri || '') || '—' }}\nAdmin'da Retry bosmang (ikkinchi tadbir yaratiladi): n8n → Executions → shu bajarilishni Retry qiling.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true
+        }
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "telegramBot",
+          "name": "Telegram bot"
+        }
+      },
+      "notes": "Send only. Never add a Telegram Trigger for this bot: the worker long-polls it."
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Prepare",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare": {
+      "main": [
+        [
+          {
+            "node": "Create Calendar event + Meet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Calendar event + Meet": {
+      "main": [
+        [
+          {
+            "node": "App: booking-confirmed",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "App: booking-failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "App: booking-confirmed": {
+      "main": [
+        [
+          {
+            "node": "Sheets: append row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram: callback failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets: append row": {
+      "main": [
+        [
+          {
+            "node": "Telegram: notify owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "App: booking-failed": {
+      "main": [
+        [
+          {
+            "node": "Telegram: calendar failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Tashkent",
+    "saveManualExecutions": true
+  },
+  "pinData": {},
+  "active": false
+}

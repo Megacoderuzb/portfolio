@@ -1,0 +1,154 @@
+{
+  "_note": "Seed data for portfolio site. status: verified = info taken from the live site or from the owner; needs_input = owner must fill in. visible=false hides the project until the owner enables it in /admin.",
+  "owner": {
+    "fullName": "Muhammadjon Abduvakhobov",
+    "role": "Full-Stack Developer",
+    "email": "muhammadjonabduvahobov7701@gmail.com",
+    "telegram": "https://t.me/Abduvaxobov_MA",
+    "linkedin": "https://www.linkedin.com/in/muhammadjonabduvahobov",
+    "github": "https://github.com/Megacoderuzb",
+    "location": "Tashkent, Uzbekistan"
+  },
+  "services": [
+    { "slug": "landing-corporate", "title": "Landing & corporate websites", "description": "Fast, SEO-ready company sites and landing pages in Next.js.", "order": 1 },
+    { "slug": "crm-pms", "title": "CRM / PMS / admin systems", "description": "Custom management systems: roles, payments, reports, dashboards.", "order": 2 },
+    { "slug": "ecommerce-ticketing", "title": "E-commerce & ticketing", "description": "Online stores and ticket sales with Click / Payme / Uzum / Atmos payments.", "order": 3 },
+    { "slug": "telegram-bots", "title": "Telegram bots & Mini Apps", "description": "Business bots, reminders, Mini Apps and admin panels.", "order": 4 },
+    { "slug": "automation-n8n", "title": "Automation (n8n)", "description": "Connect Google Sheets, Calendar, Telegram and other tools into workflows.", "order": 5 },
+    { "slug": "backend-api", "title": "Backend & API development", "description": "NestJS REST APIs, PostgreSQL, Redis, queues, Swagger docs.", "order": 6 }
+  ],
+  "projects": [
+    {
+      "slug": "poweryarn",
+      "title": "Power Yarn",
+      "url": "https://poweryarn.com",
+      "type": "Corporate website",
+      "summary": "Corporate website for an Uzbekistan-based wholesale cotton yarn supplier targeting local and international B2B buyers.",
+      "highlights": ["Product catalog by yarn type and count (carded, combed, compact, open-end, melange)", "Company, news and contacts sections", "Content in Uzbek with Russian and English SEO keywords"],
+      "services": ["landing-corporate"],
+      "stack": [],
+      "status": "verified",
+      "visible": true
+    },
+    {
+      "slug": "saadahbooks",
+      "title": "Sa'adah Books",
+      "url": "https://saadahbooks.uz",
+      "type": "Online bookstore (e-commerce)",
+      "summary": "Online bookstore selling books, stationery and religious products with delivery across Uzbekistan.",
+      "highlights": ["Catalog with categories, bestsellers, new arrivals and discounts", "Referral coupon program and free-delivery threshold", "Click, Paylov, UZCARD and HUMO payment options", "Telegram bot for order status and offers", "Donation page, blog, Uzbek / Russian / English book catalog"],
+      "services": ["ecommerce-ticketing", "telegram-bots"],
+      "stack": ["Next.js"],
+      "status": "verified",
+      "visible": true
+    },
+    {
+      "slug": "vivasam",
+      "title": "Vivasam",
+      "url": "https://vivasam.uz",
+      "type": "needs_input",
+      "summary": "needs_input: the site blocks automated reading, so the owner must describe what it does.",
+      "highlights": [],
+      "services": [],
+      "stack": [],
+      "status": "needs_input",
+      "visible": false
+    },
+    {
+      "slug": "realschool",
+      "title": "Real School",
+      "url": "https://realschool.uz",
+      "type": "needs_input",
+      "summary": "needs_input: the public page exposes only the title 'Real School', so the owner must describe the project.",
+      "highlights": [],
+      "services": [],
+      "stack": [],
+      "status": "needs_input",
+      "visible": false
+    },
+    {
+      "slug": "dormix",
+      "title": "Dormix",
+      "url": "https://dormix.abduvaxobov.uz",
+      "type": "PMS platform",
+      "summary": "Property management system (PMS) for dormitories and hostels.",
+      "highlights": [],
+      "services": ["crm-pms"],
+      "stack": [],
+      "status": "needs_input",
+      "visible": true
+    },
+    {
+      "slug": "xalqlar-dostligi-ticket",
+      "title": "Xalqlar Do'stligi Tickets",
+      "url": "https://xalqlardostligi-ticket.uz",
+      "type": "Ticketing platform",
+      "summary": "Online concert ticket sales for Uzbekistan's biggest concert hall.",
+      "highlights": [],
+      "services": ["ecommerce-ticketing"],
+      "stack": [],
+      "status": "needs_input",
+      "visible": true
+    },
+    {
+      "slug": "game-bar-crm",
+      "title": "Game Bar Automation CRM",
+      "url": null,
+      "type": "CRM / automation",
+      "summary": "CRM that automates day-to-day operations of a game bar.",
+      "highlights": [],
+      "services": ["crm-pms"],
+      "stack": [],
+      "status": "needs_input",
+      "visible": true
+    },
+    {
+      "slug": "avtomaktab-crm",
+      "title": "Driving School CRM",
+      "url": null,
+      "type": "CRM + Telegram bots",
+      "summary": "Management system for a driving school.",
+      "highlights": ["Staff roles and permissions, branches, student funnel", "Payments, theory exam module with Excel question-bank import", "Instructor and car scheduling, reports dashboard", "Manager bot and student bot in Telegram"],
+      "services": ["crm-pms", "telegram-bots"],
+      "stack": ["NestJS", "PostgreSQL"],
+      "status": "verified",
+      "visible": true
+    },
+    {
+      "slug": "davotop",
+      "title": "Davotop",
+      "url": null,
+      "type": "Pharmacy management",
+      "summary": "Pharmacy management application with a NestJS backend and a Next.js admin panel.",
+      "highlights": ["JWT authentication with role-based access control", "Admin panel with editable price tables"],
+      "services": ["crm-pms", "backend-api"],
+      "stack": ["NestJS", "Next.js", "Tailwind CSS"],
+      "status": "verified",
+      "visible": true
+    },
+    {
+      "slug": "timemanager-bot",
+      "title": "Time Manager Bot",
+      "url": null,
+      "type": "Telegram bot + Mini App",
+      "summary": "Personal time-tracking bot modeled after a money-manager app.",
+      "highlights": ["Time-block logging in Uzbek and productivity tracking", "Google Sheets sync and cron-based reminders", "React Mini App and admin panel"],
+      "services": ["telegram-bots", "automation-n8n"],
+      "stack": ["MongoDB", "Express", "React", "Node.js"],
+      "status": "verified",
+      "visible": true
+    },
+    {
+      "slug": "edutizim",
+      "title": "Edutizim LMS",
+      "url": null,
+      "type": "LMS / education CRM",
+      "summary": "Payroll and reporting module for an education-center platform.",
+      "highlights": ["Salary view for moderators and teachers", "Excel export"],
+      "services": ["crm-pms"],
+      "stack": [],
+      "status": "verified",
+      "visible": false
+    }
+  ]
+}

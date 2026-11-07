@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: portfolio
+          POSTGRES_PASSWORD: ci-password
+          POSTGRES_DB: portfolio
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U portfolio -d portfolio"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+
+    # Dummy values only: nothing here is a real credential. The unit tests use the real Postgres/Redis above;
+    # the e2e app instance gets its own throwaway secrets from playwright.config.ts.
+    env:
+      TZ: Asia/Tashkent
+      APP_URL: http://localhost:3100
+      DATABASE_URL: postgresql://portfolio:ci-password@127.0.0.1:5432/portfolio
+      REDIS_URL: redis://127.0.0.1:6379
+      N8N_WEBHOOK_SECRET: ci-webhook-secret-0123456789
+      N8N_CALLBACK_SECRET: ci-callback-secret-0123456789
+      NEXT_PUBLIC_CONTACT_EMAIL: owner@example.com
+      NEXT_PUBLIC_TELEGRAM_URL: https://t.me/example
+      NEXT_PUBLIC_LINKEDIN_URL: https://www.linkedin.com/in/example
+      NEXT_PUBLIC_GITHUB_URL: https://github.com/example
+      NEXT_TELEMETRY_DISABLED: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4 # version comes from "packageManager" in package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile # postinstall runs `prisma generate`
+
+      - name: Database (migrate + seed)
+        run: |
+          pnpm prisma migrate deploy
+          pnpm seed
+
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+
+      - run: pnpm build
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: End-to-end tests (production build)
+        run: pnpm test:e2e
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
