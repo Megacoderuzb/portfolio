@@ -51,7 +51,7 @@
   },
   "stack": {
     "title": "Texnologiyalar",
-    "subtitle": "Kundalik ishlatadigan asboblarim",
+    "subtitle": "Kundalik ishlatadigan stack",
     "groups": {
       "backend": "Backend",
       "frontend": "Frontend",
